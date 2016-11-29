@@ -10,16 +10,15 @@
 #include <ros/ros.h>
 #include <list>
 #include <unordered_map>
-#include "arc_utilities/zlib_helpers.hpp"
-#include "sdf_tools/reachability_map.hpp"
-#include "sdf_tools/ReachabilityMap.h"
+#include <arc_utilities/zlib_helpers.hpp>
+#include "reachability_map_tools/deprecated_voxel_grid_serializable_wrapper_example.hpp"
 
-using namespace sdf_tools;
+using namespace reachability_map_tools;
 
-bool ReachabilityMapGrid::SaveToFile(const std::string& filepath) const
+bool DeprecatedVoxelGridSerializableWrapper::SaveToFile(const std::string& filepath) const
 {
     // Convert to message representation
-    sdf_tools::ReachabilityMap message_rep = GetMessageRepresentation();
+    reachability_map_tools::DeprecatedReachabilityMap message_rep = GetMessageRepresentation();
     // Save message to file
     try
     {
@@ -38,7 +37,7 @@ bool ReachabilityMapGrid::SaveToFile(const std::string& filepath) const
     }
 }
 
-bool ReachabilityMapGrid::LoadFromFile(const std::string& filepath)
+bool DeprecatedVoxelGridSerializableWrapper::LoadFromFile(const std::string& filepath)
 {
     try
     {
@@ -48,11 +47,11 @@ bool ReachabilityMapGrid::LoadFromFile(const std::string& filepath)
         std::streampos end = input_file.tellg();
         input_file.seekg(0, std::ios::beg);
         std::streampos begin = input_file.tellg();
-        uint32_t serialized_size = end - begin;
+        uint32_t serialized_size = (uint32_t)(end - begin);
         std::unique_ptr<uint8_t> deser_buffer(new uint8_t[serialized_size]);
         input_file.read((char*) deser_buffer.get(), serialized_size);
         ros::serialization::IStream deser_stream(deser_buffer.get(), serialized_size);
-        sdf_tools::ReachabilityMap new_message;
+        reachability_map_tools::DeprecatedReachabilityMap new_message;
         ros::serialization::deserialize(deser_stream, new_message);
         // Load state from the message
         bool success = LoadFromMessageRepresentation(new_message);
@@ -64,7 +63,7 @@ bool ReachabilityMapGrid::LoadFromFile(const std::string& filepath)
     }
 }
 
-std::vector<uint8_t> ReachabilityMapGrid::PackBinaryRepresentation(const std::vector<REACHABILITY_MAP_CELL_TYPE>& raw) const
+std::vector<uint8_t> DeprecatedVoxelGridSerializableWrapper::PackBinaryRepresentation(const std::vector<REACHABILITY_MAP_CELL_TYPE>& raw) const
 {
     std::vector<uint8_t> packed(raw.size() * sizeof(REACHABILITY_MAP_CELL_TYPE));
     for (size_t field_idx = 0, binary_index = 0; field_idx < raw.size(); field_idx++, binary_index+=sizeof(REACHABILITY_MAP_CELL_TYPE))
@@ -76,7 +75,7 @@ std::vector<uint8_t> ReachabilityMapGrid::PackBinaryRepresentation(const std::ve
     return packed;
 }
 
-std::vector<REACHABILITY_MAP_CELL_TYPE> ReachabilityMapGrid::UnpackBinaryRepresentation(const std::vector<uint8_t>& packed) const
+std::vector<REACHABILITY_MAP_CELL_TYPE> DeprecatedVoxelGridSerializableWrapper::UnpackBinaryRepresentation(const std::vector<uint8_t>& packed) const
 {
     if ((packed.size() % sizeof(REACHABILITY_MAP_CELL_TYPE)) != 0)
     {
@@ -94,9 +93,9 @@ std::vector<REACHABILITY_MAP_CELL_TYPE> ReachabilityMapGrid::UnpackBinaryReprese
     return unpacked;
 }
 
-sdf_tools::ReachabilityMap ReachabilityMapGrid::GetMessageRepresentation() const
+DeprecatedReachabilityMap DeprecatedVoxelGridSerializableWrapper::GetMessageRepresentation() const
 {
-    sdf_tools::ReachabilityMap message_rep;
+    DeprecatedReachabilityMap message_rep;
     // Populate message
     message_rep.header.frame_id = frame_;
     Eigen::Affine3d origin_transform = reachability_map_.GetOriginTransform();
@@ -120,7 +119,7 @@ sdf_tools::ReachabilityMap ReachabilityMapGrid::GetMessageRepresentation() const
     return message_rep;
 }
 
-bool ReachabilityMapGrid::LoadFromMessageRepresentation(const sdf_tools::ReachabilityMap& message)
+bool DeprecatedVoxelGridSerializableWrapper::LoadFromMessageRepresentation(const reachability_map_tools::DeprecatedReachabilityMap& message)
 {
     // Make a new voxel grid inside
     Eigen::Translation3d origin_translation(message.origin_transform.translation.x, message.origin_transform.translation.y, message.origin_transform.translation.z);

@@ -3,9 +3,9 @@ project(reachability_map_tools)
 ## Find dependencies
 
 set(CATKIN_PACKAGES
-    geometry_msgs 
+    geometry_msgs
     roscpp
-    std_msgs 
+    std_msgs
     sdf_tools)
 
 ## Find catkin macros and libraries
@@ -19,6 +19,14 @@ find_package(Eigen REQUIRED)
 ## Declare ROS messages, services and actions ##
 ################################################
 
+## Generate messages in the 'msg' folder
+add_message_files(DIRECTORY msg
+    FILES
+    DeprecatedReachabilityMap.msg
+)
+
+## Generate added messages and services with any dependencies listed here
+generate_messages(DEPENDENCIES geometry_msgs std_msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -39,26 +47,30 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include 
-    SYSTEM 
+include_directories(include
+    SYSTEM
     ${catkin_INCLUDE_DIRS}
     ${Eigen_INCLUDE_DIRS}
     ikfast_solvers
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2 -g -march=native -Wall -Wextra -Wpedantic -Wconversion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2 -g -march=native -Wall -Wextra -Wpedantic -Wconversion -fopenmp")
 
-## Declare a cpp library
-#add_library(${PROJECT_NAME} SHARED <files>)
-#target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-#add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+## Declare a cpp library for the deprecated files
+add_library(${PROJECT_NAME}_deprecated
+    include/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.hpp
+    src/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.cpp
+)
+add_dependencies(${PROJECT_NAME}_deprecated ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
+target_link_libraries(${PROJECT_NAME}_deprecated ${catkin_LIBRARIES})
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIKFAST_NO_MAIN -DIKFAST_CLIBRARY -fopenmp")
+## Simple reachability map generation node for the IIWA 14 arm
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} )
 add_executable(generate_iiwa14_map_no_collision_checking
     src/generate_iiwa14_map_no_collision_checking.cpp
     ikfast_solvers/iiwa14/ikfast.h
     ikfast_solvers/iiwa14/ikfast0x10000048.Transform6D.0_1_3_4_5_6_f2.cpp)
+target_compile_definitions(generate_iiwa14_map_no_collision_checking PRIVATE IKFAST_NO_MAIN IKFAST_CLIBRARY)
 target_link_libraries(generate_iiwa14_map_no_collision_checking ${catkin_LIBRARIES})
 add_dependencies(generate_iiwa14_map_no_collision_checking ${catkin_EXPORTED_TARGETS})
 

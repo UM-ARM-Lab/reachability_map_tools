@@ -3,14 +3,13 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <unordered_map>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
 #include <Eigen/Geometry>
 #include <visualization_msgs/Marker.h>
-#include "arc_utilities/voxel_grid.hpp"
-#include "sdf_tools/ReachabilityMap.h"
+#include <arc_utilities/voxel_grid.hpp>
+#include <reachability_map_tools/DeprecatedReachabilityMap.h>
 
 #ifndef REACHABILITY_MAP_HPP
 #define REACHABILITY_MAP_HPP
@@ -19,7 +18,7 @@
 #define REACHABILITY_MAP_CELL_TYPE uint64_t
 #endif
 
-namespace sdf_tools
+namespace reachability_map_tools
 {
     inline std::vector<uint8_t> ReachabilityToBinary(const REACHABILITY_MAP_CELL_TYPE& value)
     {
@@ -43,7 +42,7 @@ namespace sdf_tools
         }
     }
 
-    class ReachabilityMapGrid
+    class DeprecatedVoxelGridSerializableWrapper
     {
     protected:
 
@@ -57,21 +56,21 @@ namespace sdf_tools
 
     public:
 
-        inline ReachabilityMapGrid(std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
+        inline DeprecatedVoxelGridSerializableWrapper(std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
         {
             frame_ = frame;
             VoxelGrid::VoxelGrid<REACHABILITY_MAP_CELL_TYPE> new_field(resolution, x_size, y_size, z_size, default_value);
             reachability_map_ = new_field;
         }
 
-        inline ReachabilityMapGrid(Eigen::Affine3d origin_transform, std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
+        inline DeprecatedVoxelGridSerializableWrapper(Eigen::Affine3d origin_transform, std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
         {
             frame_ = frame;
             VoxelGrid::VoxelGrid<REACHABILITY_MAP_CELL_TYPE> new_field(origin_transform, resolution, x_size, y_size, z_size, default_value);
             reachability_map_ = new_field;
         }
 
-        inline ReachabilityMapGrid() : initialized_(false) {}
+        inline DeprecatedVoxelGridSerializableWrapper() : initialized_(false) {}
 
         inline bool IsInitialized() const
         {
@@ -222,9 +221,9 @@ namespace sdf_tools
 
         bool LoadFromFile(const std::string &filepath);
 
-        sdf_tools::ReachabilityMap GetMessageRepresentation() const;
+        reachability_map_tools::DeprecatedReachabilityMap GetMessageRepresentation() const;
 
-        bool LoadFromMessageRepresentation(const sdf_tools::ReachabilityMap& message);
+        bool LoadFromMessageRepresentation(const reachability_map_tools::DeprecatedReachabilityMap& message);
     };
 }
 

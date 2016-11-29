@@ -36,7 +36,7 @@ const std::vector<double> upper_limits = {
     2.09439510239,
     3.05432619099
 };
-const double free_ind = 2;
+const int free_ind = GetFreeParameters()[0];
 
 
 bool CheckJointLimits(const std::vector<IkReal>& solution)
