@@ -1,0 +1,15 @@
+<launch>
+    <!--<include file="$(find iiwa_description)/launch/iiwa14_upload.launch"/>-->
+    <!--<param name="robot_description" command="cat $(find reachability_map_tools)/iiwa14.urdf" />-->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find iiwa_description)/urdf/iiwa14.urdf.xacro'"/>
+    <param name="use_gui" value="true"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <group ns="reachability_map_publisher">
+        <param name="data_file" value="$(find reachability_map_tools)/cached_maps/iiwa14_reachabilty_4cmgrid_6orientations.map"/>
+        <param name="base_frame" value="iiwa_link_0"/>
+    </group>
+
+    <node name="reachability_map_publisher" pkg="reachability_map_tools" type="publish_reachabilty_map"/>
+</launch>

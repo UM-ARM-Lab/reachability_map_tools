@@ -1,22 +1,10 @@
 #define IKFAST_HAS_LIBRARY
 
 #include <iiwa14/ikfast.h>
-#include <arc_utilities/voxel_grid.hpp>
 #include <omp.h>
+#include <arc_utilities/voxel_grid.hpp>
 #include <arc_utilities/zlib_helpers.hpp>
-
-
-#define NUM_ORIENTATIONS 6
-std::vector<Eigen::Matrix3d> orientations(NUM_ORIENTATIONS);
-void InitTargetOrientations()
-{
-    orientations[0] = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
-    orientations[1] = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitZ());
-    orientations[2] = Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitZ());
-    orientations[3] = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitZ());
-    orientations[4] = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY());
-    orientations[5] = Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitY());
-}
+#include "reachability_map_tools/reachability_rotations.hpp"
 
 const std::vector<double> lower_limits = {
     -2.96705972839,
@@ -104,7 +92,7 @@ std::vector<double> ComputeIKSolutions(const IkReal* trans, const Eigen::Matrix3
 
 int main()
 {
-    InitTargetOrientations();
+    const auto orientations = ReachabilityMapTools::getRotations();
 
     const double resolution = 0.04;
     const double radius = 1.3;
@@ -130,7 +118,7 @@ int main()
                     std::vector<std::vector<double>> multiple_orientation_solutions(orientations.size());
                     for (size_t orientation_ind = 0; orientation_ind < orientations.size(); ++orientation_ind)
                     {
-                        multiple_orientation_solutions[orientation_ind] = ComputeIKSolutions(trans, orientations[orientation_ind]);
+                        multiple_orientation_solutions[orientation_ind] = ComputeIKSolutions(trans, orientations[orientation_ind].matrix());
                     }
 
                     grid.SetValue(x, y, z, multiple_orientation_solutions);
@@ -141,7 +129,7 @@ int main()
 
     const auto solution_serializer = [](const std::vector<double>& joint_vals, std::vector<uint8_t>& buffer)
     {
-        return arc_helpers::SerializeVector<double>(joint_vals, buffer, std::bind(arc_helpers::SerializeFixedSizePOD<double>, std::placeholders::_1, std::placeholders::_2));
+        return arc_helpers::SerializeVector<double>(joint_vals, buffer, &arc_helpers::SerializeFixedSizePOD<double>);
     };
     const auto grid_cell_serializer = [&](const std::vector<std::vector<double>>& list, std::vector<uint8_t>& buffer)
     {
