@@ -7,7 +7,7 @@
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <group ns="reachability_map_publisher">
-        <param name="data_file" value="$(find reachability_map_tools)/cached_maps/iiwa14_reachabilty_4cmgrid_6orientations.map"/>
+        <param name="data_file" value="$(find reachability_map_tools)/cached_maps/iiwa14_reachabilty_4cmgrid_64orientations.map"/>
         <param name="base_frame" value="iiwa_link_0"/>
     </group>
 
