@@ -4,6 +4,7 @@
 #include <arc_utilities/ros_helpers.hpp>
 #include <arc_utilities/voxel_grid.hpp>
 #include <arc_utilities/zlib_helpers.hpp>
+#include <sdf_tools/tagged_object_collision_map.hpp>
 #include "reachability_map_tools/reachability_rotations.hpp"
 
 
@@ -15,45 +16,48 @@ static std_msgs::ColorRGBA blue_;
 static std_msgs::ColorRGBA light_grey_;
 
 static std::vector<double> reachability_thresholds_ = {0.9, 0.8, 0.5, 0.2, 0.1, 0.01};
+//static std::map<uint32_t, std_msgs::ColorRGBA> reachability_threshold_color_values_;
 static std::vector<std_msgs::ColorRGBA> reachability_threshold_color_values_;
 
 void initializeStandardColors()
 {
-    red_.r = 1.0;
-    red_.g = 0.0;
-    red_.b = 0.0;
-    red_.a = 1.0;
-    reachability_threshold_color_values_.push_back(red_);
+    reachability_threshold_color_values_.resize(6);
 
-    orange_.r = 1.0;
-    orange_.g = 0.5;
-    orange_.b = 0.0;
-    orange_.a = 1.0;
-    reachability_threshold_color_values_.push_back(orange_);
+    red_.r = 1.0f;
+    red_.g = 0.0f;
+    red_.b = 0.0f;
+    red_.a = 1.0f;
+    reachability_threshold_color_values_[0] = red_;
+
+    orange_.r = 1.0f;
+    orange_.g = 0.5f;
+    orange_.b = 0.0f;
+    orange_.a = 0.3f;
+    reachability_threshold_color_values_[1] = orange_;
 
     yellow_.r = 1.0f;
     yellow_.g = 1.0f;
     yellow_.b = 0.0f;
-    yellow_.a = 1.0f;
-    reachability_threshold_color_values_.push_back(yellow_);
+    yellow_.a = 0.25f;
+    reachability_threshold_color_values_[2] = yellow_;
 
-    green_.r = 0.0;
-    green_.g = 1.0;
-    green_.b = 0.0;
-    green_.a = 1.0;
-    reachability_threshold_color_values_.push_back(green_);
+    green_.r = 0.0f;
+    green_.g = 1.0f;
+    green_.b = 0.0f;
+    green_.a = 0.2f;
+    reachability_threshold_color_values_[3] = green_;
 
-    blue_.r = 0.0;
-    blue_.g = 0.0;
-    blue_.b = 1.0;
-    blue_.a = 1.0;
-    reachability_threshold_color_values_.push_back(blue_);
+    blue_.r = 0.0f;
+    blue_.g = 0.0f;
+    blue_.b = 1.0f;
+    blue_.a = 0.15f;
+    reachability_threshold_color_values_[4] = blue_;
 
     light_grey_.r = 0.8f;
     light_grey_.g = 0.8f;
     light_grey_.b = 0.8f;
-    light_grey_.a = 0.5f;
-    reachability_threshold_color_values_.push_back(light_grey_);
+    light_grey_.a = 0.1f;
+    reachability_threshold_color_values_[5] = light_grey_;
 
     assert(reachability_threshold_color_values_.size() == reachability_thresholds_.size());
 }
@@ -90,53 +94,21 @@ VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> readReachabilityMap(const
     return VoxelGrid::VoxelGrid<std::vector<std::vector<double>>>::Deserialize(decompressed_map, 0, grid_cell_deserializer).first;
 }
 
-visualization_msgs::Marker createTemplateMarker(ros::NodeHandle& nh)
+visualization_msgs::MarkerArray generateMarkerArray(const std::string& base_frame, const std::string& base_marker_namespace, const VoxelGrid::VoxelGrid<std::vector<std::vector<double>>>& reachability_map)
 {
-    visualization_msgs::Marker template_marker;
-    const auto time = ros::Time::now();
+    assert(reachability_map.GetCellSizes()[0] == reachability_map.GetCellSizes()[1]
+            && reachability_map.GetCellSizes()[0] == reachability_map.GetCellSizes()[2]);
 
-    template_marker.header.frame_id = ROSHelpers::GetParam<std::string>(nh, "base_frame", "world");;
-    template_marker.header.stamp = time;
+    ROS_INFO("Generating collision map grid");
+    sdf_tools::TaggedObjectCollisionMapGrid grid_for_export(
+                reachability_map.GetOriginTransform(),
+                base_frame,
+                reachability_map.GetCellSizes()[0],
+                reachability_map.GetXSize(),
+                reachability_map.GetYSize(),
+                reachability_map.GetZSize(),
+                sdf_tools::TAGGED_OBJECT_COLLISION_CELL());
 
-    template_marker.ns = "reachabilty_map";
-    template_marker.id = 0;
-
-    template_marker.type = visualization_msgs::Marker::SPHERE_LIST;
-    template_marker.action = visualization_msgs::Marker::MODIFY;
-
-    template_marker.scale.x = 0.005;
-    template_marker.scale.y = 0.0;
-    template_marker.scale.z = 0.0;
-
-    template_marker.color = red_;
-
-    return template_marker;
-}
-
-int main(int argc, char **argv)
-{
-    // Initialze ROS stuff
-    ros::init(argc, argv, "reachability_map_publisher");
-    ros::NodeHandle nh;
-    ros::NodeHandle ph("~");
-    initializeStandardColors();
-
-    // Read the reachability map into a data structure
-    ROS_INFO_STREAM("Private namespace is: " << ros::this_node::getName());
-    const std::string data_file = ROSHelpers::GetParam<std::string>(ph, "data_file", "reachabilty_map.map");
-    const VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> reachability_map = readReachabilityMap(data_file);
-
-    // Convert the map into a marker array
-    visualization_msgs::MarkerArray marker_array;
-    marker_array.markers.resize(reachability_thresholds_.size(), createTemplateMarker(ph));
-    for (size_t marker_ind = 0; marker_ind < marker_array.markers.size(); ++marker_ind)
-    {
-        marker_array.markers[marker_ind].color = reachability_threshold_color_values_[marker_ind];
-        marker_array.markers[marker_ind].ns += "_" + std::to_string(marker_ind);
-    }
-
-
-    ROS_INFO("Generating marker array");
     for (int64_t x_ind = 0; x_ind < reachability_map.GetNumXCells(); ++x_ind)
     {
         for (int64_t y_ind = 0; y_ind < reachability_map.GetNumXCells(); ++y_ind)
@@ -158,42 +130,59 @@ int main(int argc, char **argv)
                 {
                     const double percent_reachable = (double)count / (double)reachability_cell.size();
 
-                    size_t marker_ind;
-                    for (marker_ind = 0; marker_ind < reachability_thresholds_.size(); marker_ind++)
+                    bool found_level_set = false;
+                    for (size_t marker_ind  = 0; marker_ind < reachability_thresholds_.size() && !found_level_set; ++marker_ind)
                     {
                         if (percent_reachable >= reachability_thresholds_[marker_ind])
                         {
-                            break;
+                            found_level_set = true;
+                            const sdf_tools::TAGGED_OBJECT_COLLISION_CELL cell_value(1.0, (uint32_t)marker_ind+1);
+                            grid_for_export.Set(x_ind, y_ind, z_ind, cell_value);
                         }
-                    }
-
-                    if (marker_ind < reachability_thresholds_.size())
-                    {
-                        std::vector<double> location = reachability_map.GridIndexToLocation(x_ind, y_ind, z_ind);
-                        geometry_msgs::Point point;
-                        point.x = location[0];
-                        point.y = location[1];
-                        point.z = location[2];
-                        marker_array.markers[marker_ind].points.push_back(point);
                     }
                 }
             }
         }
     }
 
-    // Publish the map
-    ROS_INFO("Publishing marker array");
 
+    visualization_msgs::MarkerArray marker_array;
+    marker_array.markers.resize(reachability_thresholds_.size());
+    for (size_t marker_ind = 0; marker_ind < reachability_thresholds_.size(); marker_ind++)
+    {
+        std::vector<uint32_t> objects_to_render = {(uint32_t)marker_ind+1};
+        marker_array.markers[marker_ind] = grid_for_export.ExportContourOnlyForDisplay(1.0, objects_to_render);
+        marker_array.markers[marker_ind].ns = base_marker_namespace + std::to_string(reachability_thresholds_[marker_ind]);
+        marker_array.markers[marker_ind].colors = std::vector<std_msgs::ColorRGBA>(marker_array.markers[marker_ind].points.size(), reachability_threshold_color_values_[marker_ind]);
+    }
+
+    return marker_array;
+}
+
+int main(int argc, char **argv)
+{
+    // Initialze ROS stuff
+    ros::init(argc, argv, "reachability_map_publisher");
+    ros::NodeHandle nh;
+    ros::NodeHandle ph("~");
+    initializeStandardColors();
+
+    // Read the reachability map into a data structure
+    ROS_INFO_STREAM("Private namespace is: " << ros::this_node::getName());
+    const std::string data_file = ROSHelpers::GetParam<std::string>(ph, "data_file", "reachabilty_map.map");
+    const VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> reachability_map = readReachabilityMap(data_file);
+
+    // Generate a marker array from the grid
+    const std::string base_frame = ROSHelpers::GetParam<std::string>(ph, "base_frame", "world");
+    const std::string base_marker_namespace = ROSHelpers::GetParam<std::string>(ph, "marker_namespace", "iiwa14_reachability");
+    const visualization_msgs::MarkerArray marker_array = generateMarkerArray(base_frame, base_marker_namespace, reachability_map);
+
+    // Publish the map
+    ROS_INFO("Publishing marker");
     ros::Publisher reachability_map_pub = nh.advertise<visualization_msgs::MarkerArray>("reachability_map_marker_array", 0);
     ros::Rate loop_rate(2.0);
     while (ros::ok())
     {
-        const auto time = ros::Time::now();
-        for (size_t ind = 0; ind < marker_array.markers.size(); ++ind)
-        {
-            marker_array.markers[ind].header.stamp = time;
-        }
-
         reachability_map_pub.publish(marker_array);
         ros::spinOnce();
         loop_rate.sleep();
