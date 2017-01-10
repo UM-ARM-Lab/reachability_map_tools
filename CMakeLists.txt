@@ -10,7 +10,7 @@ set(CATKIN_PACKAGES
     visualization_msgs)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS ${CATKIN_PACKAGES})
+find_package(catkin REQUIRED COMPONENTS ${CATKIN_PACKAGES} message_generation)
 
 ## System dependencies are found with CMake's conventions
 find_package(cmake_modules REQUIRED)
@@ -37,7 +37,7 @@ generate_messages(DEPENDENCIES geometry_msgs std_msgs)
 catkin_package(
     INCLUDE_DIRS    include
     #LIBRARIES       ${PROJECT_NAME}
-    CATKIN_DEPENDS  ${CATKIN_PACKAGES}
+    CATKIN_DEPENDS  ${CATKIN_PACKAGES} message_runtime
     DEPENDS         system_lib
                     Eigen
 )
