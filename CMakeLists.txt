@@ -65,6 +65,15 @@ add_library(${PROJECT_NAME}_deprecated
 add_dependencies(${PROJECT_NAME}_deprecated ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME}_deprecated ${catkin_LIBRARIES})
 
+## Simple reachability map generation node for the IIWA 7 arm
+add_executable(generate_iiwa7_map_no_collision_checking
+    src/generate_iiwa7_map_no_collision_checking.cpp
+    ikfast_solvers/iiwa7/ikfast.h
+    ikfast_solvers/iiwa7/ikfast0x10000049.Transform6D.0_1_3_4_5_6_f2.cpp)
+target_compile_definitions(generate_iiwa7_map_no_collision_checking PRIVATE IKFAST_NO_MAIN IKFAST_CLIBRARY)
+target_link_libraries(generate_iiwa7_map_no_collision_checking ${catkin_LIBRARIES})
+add_dependencies(generate_iiwa7_map_no_collision_checking ${catkin_EXPORTED_TARGETS})
+
 ## Simple reachability map generation node for the IIWA 14 arm
 add_executable(generate_iiwa14_map_no_collision_checking
     src/generate_iiwa14_map_no_collision_checking.cpp
