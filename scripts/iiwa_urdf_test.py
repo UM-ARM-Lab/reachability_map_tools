@@ -2,23 +2,26 @@
 
 import time
 import openravepy as rave
-import or_plugin
 import IPython
+
+import math
 import numpy as np
+
 
 def waitrobot(robot):
     """busy wait for robot completion"""
     while not robot.GetController().IsDone():
         time.sleep(0.01)
 
+
 if __name__ == "__main__":
     env = rave.Environment()  # create openrave environment
     urdf_module = rave.RaveCreateModule(env, 'urdf')
 
     # attach viewer (optional)
-    env.SetViewer('qtcoin')
+    # env.SetViewer('qtcoin')
     # env.SetViewer('InteractiveMarker')
-    # env.SetViewer('RViz')
+    env.SetViewer('RViz')
     # env.GetViewer().SetCamera([
     #     [ 0.,  0.,  1., -3.6],
     #     [-1.,  0.,  0.,  0.],
@@ -33,8 +36,6 @@ if __name__ == "__main__":
     robot_single_arm = env.ReadRobotURI('/home/dmcconachie/Dropbox/catkin_ws/src/personal_robotics_lab/arm_ordata/data/robots/iiwa7.robot.xml')
     env.Add(robot_single_arm, True)
 
-    # while True:
-        # pass
 
     np.set_printoptions(precision=5)
 

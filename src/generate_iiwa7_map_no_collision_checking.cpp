@@ -98,7 +98,7 @@ int main()
     const double radius = 1.3;
     VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> grid(resolution, 2.0*radius, 2.0*radius, 2.0*radius, std::vector<std::vector<double>>(6, std::vector<double>(7, NAN)));
 
-    const int max_ind = std::ceil(radius/resolution);
+    const int max_ind = (int)std::ceil(radius/resolution);
     for (int x_ind = -max_ind; x_ind <= max_ind; ++x_ind)
     {
         const double x = x_ind*resolution;
