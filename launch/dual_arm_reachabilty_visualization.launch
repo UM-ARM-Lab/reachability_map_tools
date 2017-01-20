@@ -1,24 +1,21 @@
 <launch>
-    <param name="robot_description"
-           command="$(find xacro)/xacro.py '$(find arm_ordata)/data/robots/dual_arm_iiwa7.urdf.xacro'"/>
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find arm_ordata)/data/robots/dual_arm_iiwa7.urdf.xacro'"/>
     <param name="use_gui" value="false"/>
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
-    <group ns="reachability_map_publisher_left">
-        <param name="data_file"
-               value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
-        <param name="base_frame" value="left_arm_link_0"/>
-        <param name="marker_namespace" value="left_reachability"/>
-    </group>
-
     <group ns="reachability_map_publisher_right">
-        <param name="data_file"
-               value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
-        <param name="base_frame" value="right_arm_link_0"/>
-        <param name="marker_namespace" value="right_reachability"/>
+        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
+        <param name="base_frame"        value="right_arm_link_0"/>
+        <param name="marker_namespace"  value="right_reachability"/>
     </group>
 
-    <node name="reachability_map_publisher_left" pkg="reachability_map_tools" type="publish_reachabilty_map"/>
+    <group ns="reachability_map_publisher_left">
+        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
+        <param name="base_frame"        value="left_arm_link_0"/>
+        <param name="marker_namespace"  value="left_reachability"/>
+    </group>
+
     <node name="reachability_map_publisher_right" pkg="reachability_map_tools" type="publish_reachabilty_map"/>
+    <node name="reachability_map_publisher_left"  pkg="reachability_map_tools" type="publish_reachabilty_map"/>
 </launch>
