@@ -145,7 +145,6 @@ visualization_msgs::MarkerArray generateMarkerArray(const std::string& base_fram
         }
     }
 
-
     visualization_msgs::MarkerArray marker_array;
     marker_array.markers.resize(reachability_thresholds_.size());
     for (size_t marker_ind = 0; marker_ind < reachability_thresholds_.size(); marker_ind++)

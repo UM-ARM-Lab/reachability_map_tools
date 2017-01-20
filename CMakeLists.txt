@@ -55,7 +55,7 @@ include_directories(include
     ikfast_solvers
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2 -g -march=native -Wall -Wextra -Wpedantic -Wconversion -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O3 -g -Wall -Wextra -Wpedantic -Wconversion -fopenmp")
 
 ## Declare a cpp library for the deprecated files
 add_library(${PROJECT_NAME}_deprecated
