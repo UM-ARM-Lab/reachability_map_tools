@@ -14,7 +14,8 @@ find_package(catkin REQUIRED COMPONENTS ${CATKIN_PACKAGES} message_generation)
 
 ## System dependencies are found with CMake's conventions
 find_package(cmake_modules REQUIRED)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
+set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -38,8 +39,7 @@ catkin_package(
     INCLUDE_DIRS    include
     #LIBRARIES       ${PROJECT_NAME}
     CATKIN_DEPENDS  ${CATKIN_PACKAGES} message_runtime
-    DEPENDS         system_lib
-                    Eigen
+    DEPENDS         Eigen3
 )
 
 ###########
@@ -51,7 +51,7 @@ catkin_package(
 include_directories(include
     SYSTEM
     ${catkin_INCLUDE_DIRS}
-    ${Eigen_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
     ikfast_solvers
 )
 
