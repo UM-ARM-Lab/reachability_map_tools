@@ -30,10 +30,10 @@ if __name__ == "__main__":
     # ])
 
     with env:
-        name = urdf_module.SendCommand('LoadURI /home/dmcconachie/Dropbox/catkin_ws/src/personal_robotics_lab/arm_ordata/data/robots/iiwa7.urdf')
+        name = urdf_module.SendCommand('LoadURI /home/dmcconac/Dropbox/catkin_ws/src/personal_robotics_lab/arm_ordata/data/robots/iiwa7.urdf')
         robot_urdf_kinbody = env.GetKinBody(name)
 
-    robot_single_arm = env.ReadRobotURI('/home/dmcconachie/Dropbox/catkin_ws/src/personal_robotics_lab/arm_ordata/data/robots/iiwa7.robot.xml')
+    robot_single_arm = env.ReadRobotURI('/home/dmcconac/Dropbox/catkin_ws/src/personal_robotics_lab/arm_ordata/data/robots/iiwa7.robot.xml')
     env.Add(robot_single_arm, True)
 
 

@@ -17,8 +17,8 @@ def waitrobot(robot):
 if __name__ == "__main__":
     env = rave.Environment()  # create openrave environment
 
-    env.SetViewer('qtcoin')  # attach viewer (optional)
-    # env.SetViewer('RViz')  # attach viewer (optional)
+    # env.SetViewer('qtcoin')  # attach viewer (optional)
+    env.SetViewer('RViz')  # attach viewer (optional)
     env.GetViewer().SetCamera([
         [ 0.,  0.,  1., -3.6],
         [-1.,  0.,  0.,  0.],
