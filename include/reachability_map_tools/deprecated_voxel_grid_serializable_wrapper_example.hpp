@@ -79,7 +79,7 @@ namespace reachability_map_tools
 
         inline std::pair<const REACHABILITY_MAP_CELL_TYPE&, bool> GetImmutable(const Eigen::Vector3d& location) const
         {
-            return reachability_map_.GetImmutable(location);
+            return reachability_map_.GetImmutable3d(location);
         }
 
         inline std::pair<const REACHABILITY_MAP_CELL_TYPE&, bool> GetImmutable(const double x, const double y, const double z) const
@@ -99,7 +99,7 @@ namespace reachability_map_tools
 
         inline std::pair<REACHABILITY_MAP_CELL_TYPE&, bool> GetMutable(const Eigen::Vector3d& location)
         {
-            return reachability_map_.GetMutable(location);
+            return reachability_map_.GetMutable3d(location);
         }
 
         inline std::pair<REACHABILITY_MAP_CELL_TYPE&, bool> GetMutable(const double x, const double y, const double z)
@@ -124,7 +124,7 @@ namespace reachability_map_tools
 
         inline bool Set(const Eigen::Vector3d& location, const REACHABILITY_MAP_CELL_TYPE& value)
         {
-            return reachability_map_.SetValue(location, value);
+            return reachability_map_.SetValue3d(location, value);
         }
 
         inline bool Set(const int64_t x_index, const int64_t y_index, const int64_t z_index, const REACHABILITY_MAP_CELL_TYPE& value)
@@ -144,7 +144,7 @@ namespace reachability_map_tools
 
         inline bool Set(const Eigen::Vector3d& location, REACHABILITY_MAP_CELL_TYPE&& value)
         {
-            return reachability_map_.SetValue(location, value);
+            return reachability_map_.SetValue3d(location, value);
         }
 
         inline bool Set(const int64_t x_index, const int64_t y_index, const int64_t z_index, REACHABILITY_MAP_CELL_TYPE&& value)
