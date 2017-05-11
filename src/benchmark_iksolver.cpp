@@ -13,7 +13,6 @@
 #define L1_length    0.40
 #define L2_length    0.40
 #define L3_length    0.126
-#define PI M_PI
 
 const std::vector<double> lower_limits = {
     -2.96705972839,
@@ -46,10 +45,10 @@ bool CheckJointLimits(const std::vector<IkReal>& solution)
     return in_imits;
 }
 
-std::vector<double> ConvertIKSolutionToStdVector(const ikfast::IkSolutionBase<IkReal>& solution_ikreal)
+std::vector<double> ConvertIKSolutionToStdVector(const ikfast::IkSolutionBase<IkReal>& solution_ikreal, const IkReal& free_joint_val)
 {
     std::vector<IkReal> solution_vals(7);
-    solution_ikreal.GetSolution(&solution_vals[0], nullptr);
+    solution_ikreal.GetSolution(&solution_vals[0], &free_joint_val);
 
     #ifdef IKFAST_REAL
         std::vector<double> result(7);
@@ -104,13 +103,10 @@ std::vector<std::vector<double>> ComputeIKSolutions_all(const IkReal* trans, con
     std::vector<std::vector<double>> solutions_all;
 
     IkReal rot[9] = {
-        rot_eigen.data()[0], rot_eigen.data()[1], rot_eigen.data()[2],
-        rot_eigen.data()[3], rot_eigen.data()[4], rot_eigen.data()[5],
-        rot_eigen.data()[6], rot_eigen.data()[7], rot_eigen.data()[8]
+        rot_eigen.data()[0], rot_eigen.data()[3], rot_eigen.data()[6],
+        rot_eigen.data()[1], rot_eigen.data()[4], rot_eigen.data()[7],
+        rot_eigen.data()[2], rot_eigen.data()[5], rot_eigen.data()[8]
     };
-
-    std::cout<<"In ComputeIKSolutions:\n"<<PrettyPrint::PrettyPrint(rot_eigen.data())<<std::endl;
-    std::cout<<PrettyPrint::PrettyPrint(rot)<<std::endl;
 
     const double free_min = lower_limits[free_ind];
     const double free_max = upper_limits[free_ind];
@@ -124,7 +120,7 @@ std::vector<std::vector<double>> ComputeIKSolutions_all(const IkReal* trans, con
             for (size_t sol_ind = 0; sol_ind < solutions.GetNumSolutions(); ++sol_ind)
             {
 
-                const std::vector<double> solution = ConvertIKSolutionToStdVector(solutions.GetSolution(sol_ind));
+                const std::vector<double> solution = ConvertIKSolutionToStdVector(solutions.GetSolution(sol_ind), free_joint_val);
                 const bool in_joint_limits = CheckJointLimits(solution);
 
                 if (in_joint_limits)
@@ -145,18 +141,11 @@ Eigen::Quaterniond construct_quaterniond_with_angle (const double& angle, const 
 
 void print_matrix(const Eigen::Matrix3d& rot_eigen) {
     std::cout<<"Print_matrix\n";
-    for (int i=0; i<3; i++) {
-        for (int j=0; j<3; j++) {
-            std::cout<<rot_eigen.data()[i*3+j]<<'\t';
-        }
-        std::cout<<'\n';
-    }
+    std::cout<<rot_eigen<< std::endl;
 }
 
 void print_solution (const std::vector<double>& this_solution) {
-    for (size_t i=0; i<this_solution.size(); i++) {
-        std::cout<<"Joint"<<i+1<<": "<<this_solution[i]<<"\t";
-    }
+    std::cout<<std::setprecision(10)<<PrettyPrint::PrettyPrint(this_solution, true, ", ");
     std::cout<<std::endl;
 }
 
@@ -167,14 +156,14 @@ double get_angle_from_x_y (const double& x, const double& y) {
 
     if (x<0) {
         if (y>0) {
-            return PI-asin(y/sqrt(x*x+y*y));
+            return M_PI-asin(y/sqrt(x*x+y*y));
         }
         else {
-            return -PI+asin(-y/sqrt(x*x+y*y));
+            return -M_PI+asin(-y/sqrt(x*x+y*y));
         }
     }
     if (x==0) {
-        return y>0? PI/2 : -PI/2;
+        return y>0? M_PI/2 : -M_PI/2;
     }
 
     return 0;
@@ -182,7 +171,7 @@ double get_angle_from_x_y (const double& x, const double& y) {
 
 bool check_joint_angle_limit (std::vector<double>& solution, int start_ind, int end_ind) {
     for (int i=start_ind; i<=end_ind; i++) {
-        solution[i]=fmod(solution[i]+PI, 2*PI) - PI;
+        solution[i]=fmod(solution[i]+M_PI, 2*M_PI) - M_PI;
         if ((solution[i]<lower_limits[i]) || (solution[i]>upper_limits[i])) {
             return false;
         }
@@ -198,7 +187,7 @@ void calculate_joint_angles_567 (const Eigen::Vector3d& L3, const Eigen::Vector3
             solution[5]=acos(L3[2]/L3.norm()); //joint angle 6, asin(z/length)
         }
         else {    //change parameter and caluculate again
-            solution[4]=solution[4]+PI;
+            solution[4]=solution[4]+M_PI;
             solution[5]=-solution[5];            
         }
         // std::cout<<"Solution for 56:\n";
@@ -226,7 +215,7 @@ void calculate_joint_angles_34 ( const Eigen::Vector3d& L2, const Eigen::Vector3
             solution[3]=-acos(L2[2]/L2.norm()); //joint angle 4, asin(z/length)
         }
         else {    //change parameter and caluculate again
-            solution[2]=solution[2]+PI;
+            solution[2]=solution[2]+M_PI;
             solution[3]=-solution[3];    
         }
         // std::cout<<"Solution for 34:\n";
@@ -250,7 +239,7 @@ void calculate_joint_angles_12 (const Eigen::Vector3d& L1, const Eigen::Vector3d
             solution[1]=acos(L1[2]/L1.norm()); //joint angle 2, asin(z/length)
         }
         else{    //change parameter and caluculate again
-            solution[0]=solution[0]+PI;
+            solution[0]=solution[0]+M_PI;
             solution[1]=-solution[1];           
         }
         // std::cout<<"Solution for 12:\n";
@@ -289,7 +278,7 @@ std::vector<std::vector<double>> ComputeIKSolutions_all_3line(const Eigen::Vecto
 
     //construct rotation matrix about L12
     const int num_of_angles=1000;
-    const double rot_angle=2*PI/double(num_of_angles);
+    const double rot_angle=2*M_PI/double(num_of_angles);
     Eigen::Quaterniond rotation_12 = construct_quaterniond_with_angle(rot_angle, 
         L12[0]/L12_length, L12[1]/L12_length, L12[2]/L12_length); //set to 60 degree, change later
     Eigen::Matrix3d rotmat_12=rotation_12.matrix();
@@ -360,10 +349,10 @@ void show_results(const std::vector<double>& iiwa_7_base_config) {
 int main()
 {
     const auto orientations = ReachabilityMapTools::getRotations();
-    Eigen::Quaterniond this_rotation = construct_quaterniond_with_angle(PI/2, 0, 1, 0);
-    // Eigen::Quaterniond this_rotation_3line = construct_quaterniond_with_angle(0, 0, 1, 0);   
-    std::cout <<"Transform matrix:\n" << this_rotation.matrix() << std::endl <<std::endl;
-    std::cout <<"Transform quaterniond:\n" << PrettyPrint::PrettyPrint(this_rotation) << std::endl <<std::endl;
+    Eigen::Quaterniond this_rotation = construct_quaterniond_with_angle(M_PI / 2.0, 0, 1, 0);
+//    Eigen::Quaterniond this_rotation_3line = construct_quaterniond_with_angle(0, 0, 1, 0);
+    std::cout <<"Rotation as matrix:\n" << this_rotation.matrix() << std::endl <<std::endl;
+    std::cout <<"Rotation as quaterniond:\n" << PrettyPrint::PrettyPrint(this_rotation) << std::endl <<std::endl;
 
     std::vector<std::vector<double>> solution_IK;
     std::vector<std::vector<double>> solution_3line;
@@ -372,14 +361,26 @@ int main()
     const IkReal trans[3] = {trans_vec[0], trans_vec[1], trans_vec[2]};
 
     solution_IK = ComputeIKSolutions_all(trans, this_rotation.matrix());
-    // solution_3line = ComputeIKSolutions_all_3line(trans_vec, this_rotation_3line.matrix());
+//     solution_3line = ComputeIKSolutions_all_3line(trans_vec, this_rotation_3line.matrix());
 
-    // std::cout<<"3line solution Size: "<<solution_3line.size()<<'\n';   
+    // std::cout<<"3line solution Size: "<<solution_3line.size()<<'\n';
     std::cout<<"IK solution Size: "<<solution_IK.size()<<'\n';
 
     std::cout<<"Result for IK solver:\n";
-    print_solution(solution_IK[0]);
-    show_results(solution_IK[0]);
+
+    if (solution_IK.size() > 0)
+    {
+        print_solution(solution_IK[0]);
+    }
+    else
+    {
+        std::cout << "No solution\n";
+    }
+//    for (size_t i = 0; i < solution_IK.size(); i++)
+//    {
+//        print_solution(solution_IK[i]);
+//    }
+//    show_results(solution_IK[0]);
 
     // Eigen::Vector3d L1(L1_length*sqrt(3)/2, 0, L1_length/2);
     // Eigen::Vector3d L2(0, L2_length, 0);

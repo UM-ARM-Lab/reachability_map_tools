@@ -56,11 +56,10 @@ std::vector<double> ConvertIKSolutionToStdVector(const ikfast::IkSolutionBase<Ik
 
 std::vector<double> ComputeIKSolutions(const IkReal* trans, const Eigen::Matrix3d& rot_eigen)
 {
-//    std::cout << rot_eigen << std::endl;
     IkReal rot[9] = {
-        rot_eigen.data()[0], rot_eigen.data()[1], rot_eigen.data()[2],
-        rot_eigen.data()[3], rot_eigen.data()[4], rot_eigen.data()[5],
-        rot_eigen.data()[6], rot_eigen.data()[7], rot_eigen.data()[8]
+        rot_eigen.data()[0], rot_eigen.data()[3], rot_eigen.data()[6],
+        rot_eigen.data()[1], rot_eigen.data()[4], rot_eigen.data()[7],
+        rot_eigen.data()[2], rot_eigen.data()[5], rot_eigen.data()[8]
     };
 
     const double free_min = lower_limits[free_ind];
