@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find wiktor_description)/launch/visualize_wiktor.launch"/>
+    <include file="$(find victor_description)/launch/visualize_victor.launch"/>
 
     <group ns="reachability_map_publisher_right">
         <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_with_hand.map"/>
