@@ -2,13 +2,13 @@
     <include file="$(find wiktor_description)/launch/visualize_wiktor.launch"/>
 
     <group ns="reachability_map_publisher_right">
-        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
+        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_with_hand.map"/>
         <param name="base_frame"        value="wiktor_right_arm_link_0"/>
         <param name="marker_namespace"  value="right_reachability"/>
     </group>
 
     <group ns="reachability_map_publisher_left">
-        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map"/>
+        <param name="data_file"         value="$(find reachability_map_tools)/cached_maps/iiwa7_reachabilty_with_hand.map"/>
         <param name="base_frame"        value="wiktor_left_arm_link_0"/>
         <param name="marker_namespace"  value="left_reachability"/>
     </group>

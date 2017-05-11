@@ -4,6 +4,7 @@
 #include <arc_utilities/ros_helpers.hpp>
 #include <arc_utilities/voxel_grid.hpp>
 #include <arc_utilities/zlib_helpers.hpp>
+#include <arc_utilities/pretty_print.hpp>
 #include <sdf_tools/tagged_object_collision_map.hpp>
 #include "reachability_map_tools/reachability_rotations.hpp"
 
@@ -150,7 +151,8 @@ visualization_msgs::MarkerArray generateMarkerArray(const std::string& base_fram
     for (size_t marker_ind = 0; marker_ind < reachability_thresholds_.size(); marker_ind++)
     {
         std::vector<uint32_t> objects_to_render = {(uint32_t)marker_ind+1};
-        marker_array.markers[marker_ind] = grid_for_export.ExportContourOnlyForDisplay(1.0, objects_to_render);
+        // marker_array.markers[marker_ind] = grid_for_export.ExportContourOnlyForDisplay(1.0, objects_to_render);
+        marker_array.markers[marker_ind] = grid_for_export.ExportForDisplay(1.0, objects_to_render);
         marker_array.markers[marker_ind].ns = base_marker_namespace + std::to_string(reachability_thresholds_[marker_ind]);
         marker_array.markers[marker_ind].colors = std::vector<std_msgs::ColorRGBA>(marker_array.markers[marker_ind].points.size(), reachability_threshold_color_values_[marker_ind]);
     }
@@ -168,7 +170,7 @@ int main(int argc, char **argv)
 
     // Read the reachability map into a data structure
     ROS_INFO_STREAM("Private namespace is: " << ros::this_node::getName());
-    const std::string data_file = ROSHelpers::GetParam<std::string>(ph, "data_file", "reachabilty_map.map");
+    const std::string data_file = ROSHelpers::GetParam<std::string>(ph, "data_file", "~/catkin_ws/src/reachability_map_tools/cached_maps/iiwa7_reachabilty_4cmgrid_64orientations.map");
     const VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> reachability_map = readReachabilityMap(data_file);
 
     // Generate a marker array from the grid

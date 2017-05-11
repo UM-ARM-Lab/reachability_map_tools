@@ -74,6 +74,24 @@ target_compile_definitions(generate_iiwa7_map_no_collision_checking PRIVATE IKFA
 target_link_libraries(generate_iiwa7_map_no_collision_checking ${catkin_LIBRARIES})
 add_dependencies(generate_iiwa7_map_no_collision_checking ${catkin_EXPORTED_TARGETS})
 
+## Simple reachability map generation node for the IIWA 7 arm with hand
+add_executable(generate_iiwa7_map_no_collision_checking_with_hand
+    src/generate_iiwa7_map_no_collision_checking_with_hand.cpp
+    ikfast_solvers/iiwa7/ikfast.h
+    ikfast_solvers/iiwa7/ikfast0x10000049.Transform6D.0_1_3_4_5_6_f2.cpp)
+target_compile_definitions(generate_iiwa7_map_no_collision_checking_with_hand PRIVATE IKFAST_NO_MAIN IKFAST_CLIBRARY)
+target_link_libraries(generate_iiwa7_map_no_collision_checking_with_hand ${catkin_LIBRARIES})
+add_dependencies(generate_iiwa7_map_no_collision_checking_with_hand ${catkin_EXPORTED_TARGETS})
+
+## benchmark between 2 ik solvers
+add_executable(benchmark_iksolver
+    src/benchmark_iksolver.cpp
+    ikfast_solvers/iiwa7/ikfast.h
+    ikfast_solvers/iiwa7/ikfast0x10000049.Transform6D.0_1_3_4_5_6_f2.cpp)
+target_compile_definitions(benchmark_iksolver PRIVATE IKFAST_NO_MAIN IKFAST_CLIBRARY)
+target_link_libraries(benchmark_iksolver ${catkin_LIBRARIES})
+add_dependencies(benchmark_iksolver ${catkin_EXPORTED_TARGETS})
+
 ## Simple reachability map generation node for the IIWA 14 arm
 add_executable(generate_iiwa14_map_no_collision_checking
     src/generate_iiwa14_map_no_collision_checking.cpp
