@@ -98,7 +98,7 @@ DeprecatedReachabilityMap DeprecatedVoxelGridSerializableWrapper::GetMessageRepr
     DeprecatedReachabilityMap message_rep;
     // Populate message
     message_rep.header.frame_id = frame_;
-    Eigen::Affine3d origin_transform = reachability_map_.GetOriginTransform();
+    Eigen::Isometry3d origin_transform = reachability_map_.GetOriginTransform();
     message_rep.origin_transform.translation.x = origin_transform.translation().x();
     message_rep.origin_transform.translation.y = origin_transform.translation().y();
     message_rep.origin_transform.translation.z = origin_transform.translation().z();
@@ -124,7 +124,7 @@ bool DeprecatedVoxelGridSerializableWrapper::LoadFromMessageRepresentation(const
     // Make a new voxel grid inside
     Eigen::Translation3d origin_translation(message.origin_transform.translation.x, message.origin_transform.translation.y, message.origin_transform.translation.z);
     Eigen::Quaterniond origin_rotation(message.origin_transform.rotation.w, message.origin_transform.rotation.x, message.origin_transform.rotation.y, message.origin_transform.rotation.z);
-    Eigen::Affine3d origin_transform = origin_translation * origin_rotation;
+    Eigen::Isometry3d origin_transform = origin_translation * origin_rotation;
     REACHABILITY_MAP_CELL_TYPE default_value = ReachabilityFromBinary(message.default_value);
     VoxelGrid::VoxelGrid<REACHABILITY_MAP_CELL_TYPE> new_field(origin_transform, message.cell_size, message.dimensions.x, message.dimensions.y, message.dimensions.z, default_value);
     // Unpack the binary data

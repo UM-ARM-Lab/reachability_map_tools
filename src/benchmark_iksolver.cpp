@@ -342,7 +342,7 @@ double compare_solution(const std::vector<std::vector<double>>& solution_IK, con
 
 void show_results(const std::vector<double>& iiwa_7_base_config) { 
 
-    const EigenHelpers::VectorAffine3d iiwa_7_link_transforms = IIWA_7_FK_FAST::GetLinkTransforms(iiwa_7_base_config);
+    const EigenHelpers::VectorIsometry3d iiwa_7_link_transforms = IIWA_7_FK_FAST::GetLinkTransforms(iiwa_7_base_config);
     std::cout << "IIWA 7 Link transforms:\n" << PrettyPrint::PrettyPrint(iiwa_7_link_transforms, false, "\n") << std::endl;
 }
 

@@ -63,7 +63,7 @@ namespace reachability_map_tools
             reachability_map_ = new_field;
         }
 
-        inline DeprecatedVoxelGridSerializableWrapper(Eigen::Affine3d origin_transform, std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
+        inline DeprecatedVoxelGridSerializableWrapper(Eigen::Isometry3d origin_transform, std::string frame, double resolution, double x_size, double y_size, double z_size, const REACHABILITY_MAP_CELL_TYPE& default_value) : initialized_(true)
         {
             frame_ = frame;
             VoxelGrid::VoxelGrid<REACHABILITY_MAP_CELL_TYPE> new_field(origin_transform, resolution, x_size, y_size, z_size, default_value);
@@ -197,7 +197,7 @@ namespace reachability_map_tools
             return reachability_map_.GetNumZCells();
         }
 
-        inline Eigen::Affine3d GetOriginTransform() const
+        inline Eigen::Isometry3d GetOriginTransform() const
         {
             return reachability_map_.GetOriginTransform();
         }
