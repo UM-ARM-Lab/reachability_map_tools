@@ -85,11 +85,11 @@ VoxelGrid::VoxelGrid<std::vector<std::vector<double>>> readReachabilityMap(const
 
     const auto solution_deserializer = [](const std::vector<uint8_t>& buffer, const uint64_t current)
     {
-        return arc_helpers::DeserializeVector<double>(buffer, current, &arc_helpers::DeserializeFixedSizePOD<double>);
+        return arc_utilities::DeserializeVector<double>(buffer, current, &arc_utilities::DeserializeFixedSizePOD<double>);
     };
     const auto grid_cell_deserializer = [&](const std::vector<uint8_t>& buffer, const uint64_t current)
     {
-        return arc_helpers::DeserializeVector<std::vector<double>>(buffer, current, solution_deserializer);
+        return arc_utilities::DeserializeVector<std::vector<double>>(buffer, current, solution_deserializer);
     };
 
     return VoxelGrid::VoxelGrid<std::vector<std::vector<double>>>::Deserialize(decompressed_map, 0, grid_cell_deserializer).first;

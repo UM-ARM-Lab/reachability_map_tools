@@ -128,11 +128,11 @@ int main()
 
     const auto solution_serializer = [](const std::vector<double>& joint_vals, std::vector<uint8_t>& buffer)
     {
-        return arc_helpers::SerializeVector<double>(joint_vals, buffer, &arc_helpers::SerializeFixedSizePOD<double>);
+        return arc_utilities::SerializeVector<double>(joint_vals, buffer, &arc_utilities::SerializeFixedSizePOD<double>);
     };
     const auto grid_cell_serializer = [&](const std::vector<std::vector<double>>& list, std::vector<uint8_t>& buffer)
     {
-        return arc_helpers::SerializeVector<std::vector<double>>(list, buffer, solution_serializer);
+        return arc_utilities::SerializeVector<std::vector<double>>(list, buffer, solution_serializer);
     };
 
     std::vector<uint8_t> buffer;
