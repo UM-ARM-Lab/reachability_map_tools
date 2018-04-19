@@ -57,6 +57,7 @@ std::vector<double> ConvertIKSolutionToStdVector(const ikfast::IkSolutionBase<Ik
 std::vector<double> ComputeIKSolutions(const IkReal* trans, const Eigen::Matrix3d& rot_eigen, bool& flag)
 {
     flag=true;
+    // Note that Eigen stores elements in column major order by default, so we have to transpose the data
     IkReal rot[9] = {
         rot_eigen.data()[0], rot_eigen.data()[3], rot_eigen.data()[6],
         rot_eigen.data()[1], rot_eigen.data()[4], rot_eigen.data()[7],
