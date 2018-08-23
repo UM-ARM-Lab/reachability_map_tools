@@ -57,13 +57,13 @@ include_directories(include
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O3 -g -Wall -Wextra -Wpedantic -Wconversion -fopenmp")
 
-## Declare a cpp library for the deprecated files
-add_library(${PROJECT_NAME}_deprecated
-    include/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.hpp
-    src/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.cpp
-)
-add_dependencies(${PROJECT_NAME}_deprecated ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
-target_link_libraries(${PROJECT_NAME}_deprecated ${catkin_LIBRARIES})
+### Declare a cpp library for the deprecated files
+#add_library(${PROJECT_NAME}_deprecated
+#    include/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.hpp
+#    src/${PROJECT_NAME}/deprecated_voxel_grid_serializable_wrapper_example.cpp
+#)
+#add_dependencies(${PROJECT_NAME}_deprecated ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
+#target_link_libraries(${PROJECT_NAME}_deprecated ${catkin_LIBRARIES})
 
 ## Simple reachability map generation node for the IIWA 7 arm
 add_executable(generate_iiwa7_map_no_collision_checking
