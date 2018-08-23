@@ -138,7 +138,7 @@ visualization_msgs::MarkerArray generateMarkerArray(const std::string& base_fram
                         {
                             found_level_set = true;
                             const sdf_tools::TAGGED_OBJECT_COLLISION_CELL cell_value(1.0, (uint32_t)marker_ind+1);
-                            grid_for_export.Set(x_ind, y_ind, z_ind, cell_value);
+                            grid_for_export.SetValue(x_ind, y_ind, z_ind, cell_value);
                         }
                     }
                 }
